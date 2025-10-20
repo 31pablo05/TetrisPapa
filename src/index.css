@@ -87,6 +87,27 @@ button, input, select, textarea {
     min-height: 44px;
     min-width: 44px;
   }
+  
+  body {
+    /* Permitir scroll vertical en móvil */
+    overflow-y: auto;
+    overflow-x: hidden;
+    /* Mejorar el scroll en iOS */
+    -webkit-overflow-scrolling: touch;
+    /* Evitar el zoom al tocar inputs/botones */
+    touch-action: manipulation;
+  }
+  
+  /* Espaciado extra en móvil para asegurar que todo sea accesible */
+  .controls-container {
+    padding-bottom: 20px;
+  }
+  
+  /* Asegurar que el botón Jugar sea bien visible */
+  .controls-container button {
+    position: relative;
+    z-index: 10;
+  }
 }
 
 /* Prevenir selección de texto en elementos interactivos */

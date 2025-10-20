@@ -69,11 +69,11 @@ function App() {
           </div>
 
           {/* GameBoard - Centro */}
-          <div className="md:col-span-2 order-2 flex justify-center">
-            <div className="w-full max-w-xs md:max-w-md">
+          <div className="md:col-span-2 order-2 flex justify-center mb-4 md:mb-0">
+            <div className="w-full max-w-[280px] md:max-w-md">
               <GameBoard 
                 board={board} 
-                className="w-full aspect-[1/2] shadow-2xl"
+                className="w-full aspect-[1/2] shadow-2xl mx-auto"
               />
             </div>
           </div>
@@ -91,8 +91,8 @@ function App() {
 
         </div>
 
-        {/* Footer */}
-        <div className="text-center mt-6 text-gray-500 text-xs">
+        {/* Footer con padding bottom extra para móvil */}
+        <div className="text-center mt-6 pb-8 md:pb-2 text-gray-500 text-xs">
           <p>Hecho con ❤️ usando React + Vite + Tailwind CSS</p>
           <p className="mt-1 hidden md:block">
             Controles: Flechas para mover, Espacio/↑ para rotar, P para pausa

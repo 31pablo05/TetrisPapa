@@ -68,15 +68,15 @@ const Controls = ({ touchControls, isPlaying, isGameOver, startGame, resetGame }
   return (
     <div className="controls-container space-y-4">
       {/* Controles de juego (Start/Pause/Reset) */}
-      <div className="flex flex-wrap gap-2 justify-center">
+      <div className="flex flex-wrap gap-3 justify-center">
         {!isPlaying && !isGameOver && (
           <ControlButton 
             onClick={startGame} 
             variant="action" 
-            className="px-6 py-3 text-base w-full md:w-auto"
+            className="px-8 py-4 text-lg font-bold w-full md:w-auto min-h-[60px] shadow-xl"
           >
             <PlayIcon />
-            <span className="ml-2">Jugar</span>
+            <span className="ml-2">🎮 JUGAR</span>
           </ControlButton>
         )}
         
@@ -84,7 +84,7 @@ const Controls = ({ touchControls, isPlaying, isGameOver, startGame, resetGame }
           <ControlButton 
             onClick={touchControls.pause} 
             variant="secondary" 
-            className="px-4 py-3 text-sm"
+            className="px-4 py-3 text-sm w-full md:w-auto"
           >
             <PauseIcon />
             <span className="ml-2">Pausa</span>
@@ -95,9 +95,9 @@ const Controls = ({ touchControls, isPlaying, isGameOver, startGame, resetGame }
           <ControlButton 
             onClick={resetGame} 
             variant="action" 
-            className="px-6 py-3 text-base w-full md:w-auto"
+            className="px-6 py-3 text-base w-full md:w-auto min-h-[50px]"
           >
-            <span>Reiniciar</span>
+            <span>🔄 Reiniciar</span>
           </ControlButton>
         )}
       </div>

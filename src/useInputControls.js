@@ -49,21 +49,27 @@ export const useInputControls = ({
     // addEventListener with passive: false to allow preventDefault on some browsers
     window.addEventListener('keydown', handleKeyDown, { passive: false });
 
-    // Prevent touch scrolling while interacting with the game area (mobile/desktop hybrid)
-    const preventScroll = (e) => {
-      // If user is pressing arrow keys or touching controls, prevent page scroll
-      if (e?.target && (e.target.closest('.controls-container') || e.target.closest('.game-board'))) {
+    // Prevent touch scrolling only on game board, not on the whole page
+    const preventGameBoardScroll = (e) => {
+      // Only prevent scroll if touching directly the game board
+      if (e?.target && e.target.closest('.game-board')) {
         e.preventDefault();
       }
     };
 
-    window.addEventListener('touchstart', preventScroll, { passive: false });
-    window.addEventListener('touchmove', preventScroll, { passive: false });
+    // Only add touch prevention to the game board area
+    const gameBoard = document.querySelector('.game-board');
+    if (gameBoard) {
+      gameBoard.addEventListener('touchstart', preventGameBoardScroll, { passive: false });
+      gameBoard.addEventListener('touchmove', preventGameBoardScroll, { passive: false });
+    }
 
     return () => {
-      window.removeEventListener('keydown', handleKeyDown, { passive: false });
-      window.removeEventListener('touchstart', preventScroll);
-      window.removeEventListener('touchmove', preventScroll);
+      window.removeEventListener('keydown', handleKeyDown);
+      if (gameBoard) {
+        gameBoard.removeEventListener('touchstart', preventGameBoardScroll);
+        gameBoard.removeEventListener('touchmove', preventGameBoardScroll);
+      }
     };
   }, [handleKeyDown]);
 
