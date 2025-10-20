@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useRef } from 'react';
+import { useEffect, useCallback } from 'react';
 
 export const useInputControls = ({
   moveTetromino,
@@ -9,32 +9,27 @@ export const useInputControls = ({
   isPlaying,
   isGameOver
 }) => {
-  const keysPressed = useRef(new Set());
-  const intervalRef = useRef(null);
-
-  // Manejar teclas presionadas
+  // Manejar controles de teclado - SIMPLE, sin interferir con el game loop
   const handleKeyDown = useCallback((event) => {
     if (isGameOver || event.repeat) return;
-    
-    keysPressed.current.add(event.code);
 
     switch (event.code) {
       case 'ArrowLeft':
         event.preventDefault();
-        moveTetromino(-1);
+        if (isPlaying) moveTetromino(-1);
         break;
       case 'ArrowRight':
         event.preventDefault();
-        moveTetromino(1);
+        if (isPlaying) moveTetromino(1);
         break;
       case 'ArrowDown':
         event.preventDefault();
-        dropTetromino();
+        if (isPlaying) dropTetromino();
         break;
       case 'ArrowUp':
       case 'Space':
         event.preventDefault();
-        rotateTetromino();
+        if (isPlaying) rotateTetromino();
         break;
       case 'KeyP':
         event.preventDefault();
@@ -42,58 +37,35 @@ export const useInputControls = ({
         break;
       case 'Enter':
         event.preventDefault();
-        hardDrop();
+        if (isPlaying) hardDrop();
         break;
       default:
         break;
     }
-  }, [moveTetromino, rotateTetromino, dropTetromino, hardDrop, togglePause, isGameOver]);
-
-  // Manejar teclas liberadas
-  const handleKeyUp = useCallback((event) => {
-    keysPressed.current.delete(event.code);
-  }, []);
-
-  // Movimiento continuo para flechas horizontales
-  useEffect(() => {
-    if (!isPlaying || isGameOver) {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-      return;
-    }
-
-    intervalRef.current = setInterval(() => {
-      if (keysPressed.current.has('ArrowLeft')) {
-        moveTetromino(-1);
-      } else if (keysPressed.current.has('ArrowRight')) {
-        moveTetromino(1);
-      } else if (keysPressed.current.has('ArrowDown')) {
-        dropTetromino();
-      }
-    }, 150); // Movimiento continuo cada 150ms
-
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
-  }, [isPlaying, isGameOver, moveTetromino, dropTetromino]);
+  }, [moveTetromino, rotateTetromino, dropTetromino, hardDrop, togglePause, isPlaying, isGameOver]);
 
   // Configurar event listeners para teclado
   useEffect(() => {
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
-    
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
+    // addEventListener with passive: false to allow preventDefault on some browsers
+    window.addEventListener('keydown', handleKeyDown, { passive: false });
+
+    // Prevent touch scrolling while interacting with the game area (mobile/desktop hybrid)
+    const preventScroll = (e) => {
+      // If user is pressing arrow keys or touching controls, prevent page scroll
+      if (e?.target && (e.target.closest('.controls-container') || e.target.closest('.game-board'))) {
+        e.preventDefault();
       }
     };
-  }, [handleKeyDown, handleKeyUp]);
+
+    window.addEventListener('touchstart', preventScroll, { passive: false });
+    window.addEventListener('touchmove', preventScroll, { passive: false });
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown, { passive: false });
+      window.removeEventListener('touchstart', preventScroll);
+      window.removeEventListener('touchmove', preventScroll);
+    };
+  }, [handleKeyDown]);
 
   // Funciones para controles táctiles (botones en pantalla)
   const touchControls = {

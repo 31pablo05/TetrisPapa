@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { 
   BOARD_WIDTH, 
   BOARD_HEIGHT, 
@@ -90,6 +90,8 @@ export const useTetrisLogic = () => {
   const [dropTime, setDropTime] = useState(INITIAL_DROP_TIME);
   const [gameStartTime, setGameStartTime] = useState(null);
   const [showLevelUp, setShowLevelUp] = useState(false);
+  const lastActionRef = useRef(0);
+  const LOCK_WINDOW_MS = 300; // ms during which recent player action prevents immediate lock
 
   // Inicializar el juego
   const initializeGame = useCallback(() => {
@@ -104,7 +106,7 @@ export const useTetrisLogic = () => {
     setLevel(1);
     setLines(0);
     setIsGameOver(false);
-    setDropTime(INITIAL_DROP_TIME);
+  setDropTime(700); // Velocidad inicial (ms per drop)
     setGameStartTime(Date.now());
     setShowLevelUp(false);
   }, []);
@@ -135,6 +137,11 @@ export const useTetrisLogic = () => {
     if (isValidMove(board, currentTetromino, currentTetromino.x, newY)) {
       setCurrentTetromino(prev => ({ ...prev, y: newY }));
     } else {
+      // Si la acción del jugador fue reciente, darle una ventana para seguir moviendo/rotando
+      if (Date.now() - lastActionRef.current < LOCK_WINDOW_MS) {
+        return; // no bloquear aún
+      }
+
       // La pieza no puede moverse más, la colocamos en el tablero
       const newBoard = placeTetromino(board, currentTetromino);
       const { board: clearedBoard, linesCleared } = clearLines(newBoard);
@@ -148,11 +155,12 @@ export const useTetrisLogic = () => {
         setLines(prev => {
           const newLines = prev + linesCleared;
           
-          // Calcular nuevo nivel basado en líneas (cada 10 líneas)
-          const newLevel = Math.floor(newLines / 10) + 1;
+          // Calcular nuevo nivel basado en líneas (cada 5 líneas para progresión más rápida)
+          const newLevel = Math.floor(newLines / 5) + 1;
           if (newLevel > level) {
             setLevel(newLevel);
-            const newDropTime = Math.max(100, INITIAL_DROP_TIME - (newLevel - 1) * 80);
+            // Progresión más agresiva: cada nivel reduce 150ms (en lugar de 80ms)
+            const newDropTime = Math.max(80, 800 - (newLevel - 1) * 150);
             setDropTime(newDropTime);
             
             // Mostrar notificación de nivel
@@ -177,27 +185,41 @@ export const useTetrisLogic = () => {
     }
   }, [board, currentTetromino, isGameOver, isPlaying, level, nextTetromino]);
 
+  // Keep a ref to the latest dropTetromino so intervals/loops call the up-to-date function
+  const dropRef = useRef(dropTetromino);
+  useEffect(() => {
+    dropRef.current = dropTetromino;
+  }, [dropTetromino]);
+
   // Mover pieza horizontalmente
   const moveTetromino = useCallback((direction) => {
-    if (!currentTetromino || isGameOver || !isPlaying) return;
-    
-    const newX = currentTetromino.x + direction;
-    
-    if (isValidMove(board, currentTetromino, newX, currentTetromino.y)) {
-      setCurrentTetromino(prev => ({ ...prev, x: newX }));
-    }
-  }, [board, currentTetromino, isGameOver, isPlaying]);
+    if (isGameOver || !isPlaying) return;
+
+    setCurrentTetromino(prev => {
+      if (!prev) return prev;
+      const newX = prev.x + direction;
+      if (isValidMove(board, prev, newX, prev.y)) {
+        lastActionRef.current = Date.now();
+        return { ...prev, x: newX };
+      }
+      return prev;
+    });
+  }, [board, isGameOver, isPlaying]);
 
   // Rotar pieza
   const rotateTetromino_func = useCallback(() => {
-    if (!currentTetromino || isGameOver || !isPlaying) return;
-    
-    const rotatedTetromino = rotateTetromino(currentTetromino);
-    
-    if (isValidMove(board, currentTetromino, currentTetromino.x, currentTetromino.y, rotatedTetromino.shape)) {
-      setCurrentTetromino(rotatedTetromino);
-    }
-  }, [board, currentTetromino, isGameOver, isPlaying]);
+    if (isGameOver || !isPlaying) return;
+
+    setCurrentTetromino(prev => {
+      if (!prev) return prev;
+      const rotated = rotateTetromino(prev);
+      if (isValidMove(board, prev, prev.x, prev.y, rotated.shape)) {
+        lastActionRef.current = Date.now();
+        return rotated;
+      }
+      return prev;
+    });
+  }, [board, isGameOver, isPlaying]);
 
   // Caída rápida
   const hardDrop = useCallback(() => {
@@ -242,46 +264,39 @@ export const useTetrisLogic = () => {
   useEffect(() => {
     if (!isPlaying || isGameOver || !gameStartTime) return;
 
+    // Subir nivel automáticamente cada 20 segundos para hacer la progresión más notoria
     const levelUpInterval = setInterval(() => {
-      const currentTime = Date.now();
-      const timeElapsed = currentTime - gameStartTime;
-      const minutesElapsed = Math.floor(timeElapsed / 60000); // minutos transcurridos
-      
-      // Subir nivel cada 2 minutos automáticamente
-      const autoLevel = Math.floor(minutesElapsed / 2) + 1;
-      
+      const elapsed = Date.now() - gameStartTime; // ms
+      const autoLevel = Math.floor(elapsed / 20000) + 1; // +1 so initial level is 1
+
       setLevel(currentLevel => {
         if (autoLevel > currentLevel) {
-          const newDropTime = Math.max(50, INITIAL_DROP_TIME - (autoLevel - 1) * 100);
+          const newDropTime = Math.max(50, 700 - (autoLevel - 1) * 200); // reducción más agresiva
           setDropTime(newDropTime);
-          
-          // Mostrar notificación de nivel
+
           setShowLevelUp(true);
-          setTimeout(() => setShowLevelUp(false), 2000);
-          
+          setTimeout(() => setShowLevelUp(false), 1800);
+
           return autoLevel;
         }
         return currentLevel;
       });
-    }, 30000); // Verificar cada 30 segundos
+    }, 20000); // check every 20s
 
     return () => clearInterval(levelUpInterval);
   }, [isPlaying, isGameOver, gameStartTime]);
 
   // Game loop automático con timer independiente
   useEffect(() => {
-    if (!isPlaying || isGameOver || !currentTetromino) {
-      return;
-    }
+    if (!isPlaying || isGameOver) return;
 
-    const dropInterval = setInterval(() => {
-      dropTetromino();
+    const id = setInterval(() => {
+      // call the latest drop function saved in ref to avoid stale closures
+      if (dropRef.current) dropRef.current();
     }, dropTime);
 
-    return () => {
-      clearInterval(dropInterval);
-    };
-  }, [isPlaying, isGameOver, dropTime, currentTetromino, dropTetromino]);
+    return () => clearInterval(id);
+  }, [isPlaying, isGameOver, dropTime]);
 
   // Inicializar el primer juego
   useEffect(() => {

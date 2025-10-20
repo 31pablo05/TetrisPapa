@@ -40,24 +40,24 @@ function App() {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      <div className="container mx-auto px-4 py-4 max-w-6xl">
         
         {/* Header */}
-        <div className="text-center mb-6">
-          <h1 className="text-4xl sm:text-6xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">
+        <div className="text-center mb-4 md:mb-6">
+          <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">
             TETRIS
           </h1>
-          <p className="text-gray-400 text-sm sm:text-base">
+          <p className="text-gray-400 text-sm md:text-base">
             Juego clásico con diseño moderno
           </p>
         </div>
 
         {/* Layout principal */}
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-6 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6 items-start">
           
-          {/* Scoreboard - En móvil va arriba */}
-          <div className="sm:col-span-1 order-1 sm:order-1">
+          {/* Scoreboard */}
+          <div className="md:col-span-1 order-1">
             <ScoreBoard
               score={score}
               level={level}
@@ -68,9 +68,9 @@ function App() {
             />
           </div>
 
-          {/* GameBoard - Centro en todas las pantallas */}
-          <div className="sm:col-span-2 order-2 sm:order-2 flex justify-center">
-            <div className="w-full max-w-sm">
+          {/* GameBoard - Centro */}
+          <div className="md:col-span-2 order-2 flex justify-center">
+            <div className="w-full max-w-xs md:max-w-md">
               <GameBoard 
                 board={board} 
                 className="w-full aspect-[1/2] shadow-2xl"
@@ -78,8 +78,8 @@ function App() {
             </div>
           </div>
 
-          {/* Controls - En móvil va abajo, en desktop al lado derecho */}
-          <div className="sm:col-span-1 order-3 sm:order-3">
+          {/* Controls */}
+          <div className="md:col-span-1 order-3">
             <Controls
               touchControls={touchControls}
               isPlaying={isPlaying}
@@ -91,30 +91,31 @@ function App() {
 
         </div>
 
-        {/* Modal de Game Over */}
-        <GameOverModal
-          isVisible={isGameOver}
-          score={score}
-          level={level}
-          lines={lines}
-          onRestart={resetGame}
-        />
-
-        {/* Notificación de Level Up */}
-        <LevelUpNotification
-          isVisible={showLevelUp}
-          level={level}
-        />
-
-        {/* Footer con información adicional */}
-        <div className="text-center mt-8 text-gray-500 text-xs">
+        {/* Footer */}
+        <div className="text-center mt-6 text-gray-500 text-xs">
           <p>Hecho con ❤️ usando React + Vite + Tailwind CSS</p>
-          <p className="mt-1">
+          <p className="mt-1 hidden md:block">
             Controles: Flechas para mover, Espacio/↑ para rotar, P para pausa
           </p>
         </div>
 
       </div>
+
+      {/* Modal de Game Over */}
+      <GameOverModal
+        isVisible={isGameOver}
+        score={score}
+        level={level}
+        lines={lines}
+        onRestart={resetGame}
+      />
+
+      {/* Notificación de Level Up */}
+      <LevelUpNotification
+        isVisible={showLevelUp}
+        level={level}
+      />
+
     </div>
   );
 }

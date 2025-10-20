@@ -68,12 +68,12 @@ const Controls = ({ touchControls, isPlaying, isGameOver, startGame, resetGame }
   return (
     <div className="controls-container space-y-4">
       {/* Controles de juego (Start/Pause/Reset) */}
-      <div className="flex gap-2 justify-center">
+      <div className="flex flex-wrap gap-2 justify-center">
         {!isPlaying && !isGameOver && (
           <ControlButton 
             onClick={startGame} 
             variant="action" 
-            className="px-6 py-3 text-sm"
+            className="px-6 py-3 text-base w-full md:w-auto"
           >
             <PlayIcon />
             <span className="ml-2">Jugar</span>
@@ -87,7 +87,7 @@ const Controls = ({ touchControls, isPlaying, isGameOver, startGame, resetGame }
             className="px-4 py-3 text-sm"
           >
             <PauseIcon />
-            <span className="ml-2 hidden sm:inline">Pausa</span>
+            <span className="ml-2">Pausa</span>
           </ControlButton>
         )}
         
@@ -95,16 +95,16 @@ const Controls = ({ touchControls, isPlaying, isGameOver, startGame, resetGame }
           <ControlButton 
             onClick={resetGame} 
             variant="action" 
-            className="px-6 py-3 text-sm"
+            className="px-6 py-3 text-base w-full md:w-auto"
           >
             <span>Reiniciar</span>
           </ControlButton>
         )}
       </div>
 
-      {/* Controles de movimiento (solo visible cuando se está jugando) */}
+      {/* Controles de movimiento (solo visible en móvil cuando se está jugando) */}
       {isPlaying && !isGameOver && (
-        <div className="sm:hidden">
+        <div className="md:hidden">
           {/* Fila superior: Rotar */}
           <div className="flex justify-center mb-4">
             <ControlButton 
@@ -136,7 +136,7 @@ const Controls = ({ touchControls, isPlaying, isGameOver, startGame, resetGame }
           </div>
 
           {/* Fila inferior: Bajar */}
-          <div className="flex justify-center gap-4">
+          <div className="flex justify-center gap-2">
             <ControlButton 
               onClick={touchControls.moveDown} 
               className="w-20 h-12 text-sm"
@@ -162,12 +162,17 @@ const Controls = ({ touchControls, isPlaying, isGameOver, startGame, resetGame }
         </div>
       )}
 
-      {/* Mensaje para desktop cuando no hay controles visibles */}
-      {isPlaying && !isGameOver && (
-        <div className="hidden sm:block text-center text-gray-400 text-sm">
-          Usa las teclas del teclado para jugar
+      {/* Instrucciones para desktop */}
+      <div className="hidden md:block bg-gray-800/50 rounded-lg p-3 border border-gray-600/30">
+        <h3 className="text-white text-sm font-semibold mb-2">Controles</h3>
+        <div className="text-gray-300 text-xs space-y-1">
+          <div>← → Mover</div>
+          <div>↓ Bajar</div>
+          <div>↑ / Espacio: Rotar</div>
+          <div>Enter: Caída rápida</div>
+          <div>P: Pausa</div>
         </div>
-      )}
+      </div>
     </div>
   );
 };

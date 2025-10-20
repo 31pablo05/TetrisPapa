@@ -38,7 +38,7 @@ const ScoreBoard = ({ score, level, lines, nextTetromino, isPlaying, isGameOver 
   return (
     <div className="scoreboard space-y-4">
       {/* Información de puntuación */}
-      <div className="grid grid-cols-3 gap-3 sm:grid-cols-1 sm:gap-4">
+      <div className="grid grid-cols-3 md:grid-cols-1 gap-3 md:gap-4">
         <div className="bg-gradient-to-br from-blue-600/20 to-blue-800/20 rounded-lg p-3 border border-blue-500/30">
           <div className="text-blue-300 text-xs font-medium mb-1">PUNTOS</div>
           <div className="text-white text-lg font-bold">{score.toLocaleString()}</div>
