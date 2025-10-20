@@ -5,6 +5,7 @@ import GameBoard from './GameBoard';
 import ScoreBoard from './ScoreBoard';
 import Controls from './Controls';
 import GameOverModal from './GameOverModal';
+import LevelUpNotification from './LevelUpNotification';
 import './App.css'
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
     lines,
     isGameOver,
     isPlaying,
+    showLevelUp,
     startGame,
     togglePause,
     resetGame,
@@ -96,6 +98,12 @@ function App() {
           level={level}
           lines={lines}
           onRestart={resetGame}
+        />
+
+        {/* Notificación de Level Up */}
+        <LevelUpNotification
+          isVisible={showLevelUp}
+          level={level}
         />
 
         {/* Footer con información adicional */}

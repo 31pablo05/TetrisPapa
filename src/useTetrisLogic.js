@@ -105,6 +105,8 @@ export const useTetrisLogic = () => {
     setLines(0);
     setIsGameOver(false);
     setDropTime(INITIAL_DROP_TIME);
+    setGameStartTime(Date.now());
+    setShowLevelUp(false);
   }, []);
 
   // Comenzar el juego
@@ -143,14 +145,23 @@ export const useTetrisLogic = () => {
       if (linesCleared > 0) {
         const points = linesCleared * 100 * level;
         setScore(prev => prev + points);
-        setLines(prev => prev + linesCleared);
-        
-        // Aumentar nivel cada 10 líneas
-        const newLevel = Math.floor((lines + linesCleared) / 10) + 1;
-        if (newLevel > level) {
-          setLevel(newLevel);
-          setDropTime(Math.max(100, INITIAL_DROP_TIME - (newLevel - 1) * 50));
-        }
+        setLines(prev => {
+          const newLines = prev + linesCleared;
+          
+          // Calcular nuevo nivel basado en líneas (cada 10 líneas)
+          const newLevel = Math.floor(newLines / 10) + 1;
+          if (newLevel > level) {
+            setLevel(newLevel);
+            const newDropTime = Math.max(100, INITIAL_DROP_TIME - (newLevel - 1) * 80);
+            setDropTime(newDropTime);
+            
+            // Mostrar notificación de nivel
+            setShowLevelUp(true);
+            setTimeout(() => setShowLevelUp(false), 2000);
+          }
+          
+          return newLines;
+        });
       }
       
       // Verificar Game Over
@@ -164,7 +175,7 @@ export const useTetrisLogic = () => {
       setCurrentTetromino(nextTetromino);
       setNextTetromino(getRandomTetromino());
     }
-  }, [board, currentTetromino, isGameOver, isPlaying, level, lines, nextTetromino]);
+  }, [board, currentTetromino, isGameOver, isPlaying, level, nextTetromino]);
 
   // Mover pieza horizontalmente
   const moveTetromino = useCallback((direction) => {
@@ -227,6 +238,36 @@ export const useTetrisLogic = () => {
     return boardWithPiece;
   }, [board, currentTetromino]);
 
+  // Sistema de nivel automático basado en tiempo
+  useEffect(() => {
+    if (!isPlaying || isGameOver || !gameStartTime) return;
+
+    const levelUpInterval = setInterval(() => {
+      const currentTime = Date.now();
+      const timeElapsed = currentTime - gameStartTime;
+      const minutesElapsed = Math.floor(timeElapsed / 60000); // minutos transcurridos
+      
+      // Subir nivel cada 2 minutos automáticamente
+      const autoLevel = Math.floor(minutesElapsed / 2) + 1;
+      
+      setLevel(currentLevel => {
+        if (autoLevel > currentLevel) {
+          const newDropTime = Math.max(50, INITIAL_DROP_TIME - (autoLevel - 1) * 100);
+          setDropTime(newDropTime);
+          
+          // Mostrar notificación de nivel
+          setShowLevelUp(true);
+          setTimeout(() => setShowLevelUp(false), 2000);
+          
+          return autoLevel;
+        }
+        return currentLevel;
+      });
+    }, 30000); // Verificar cada 30 segundos
+
+    return () => clearInterval(levelUpInterval);
+  }, [isPlaying, isGameOver, gameStartTime]);
+
   // Game loop automático con timer independiente
   useEffect(() => {
     if (!isPlaying || isGameOver || !currentTetromino) {
@@ -256,6 +297,7 @@ export const useTetrisLogic = () => {
     lines,
     isGameOver,
     isPlaying,
+    showLevelUp,
     
     // Acciones
     startGame,
