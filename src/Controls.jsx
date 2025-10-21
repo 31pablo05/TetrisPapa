@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 
 // Iconos simples usando CSS
 const ArrowLeftIcon = () => (
@@ -37,29 +37,84 @@ const PlayIcon = () => (
   </svg>
 );
 
-const ControlButton = ({ onClick, children, className = '', disabled = false, variant = 'primary' }) => {
+const ControlButton = ({ onClick, children, className = '', disabled = false, variant = 'primary', size = 'normal' }) => {
   const touchedRef = useRef(false);
-  const baseClasses = "flex items-center justify-center font-semibold rounded-lg transition-all duration-150 active:scale-95 select-none";
+  const [isPressed, setIsPressed] = useState(false);
+  
+  const baseClasses = "flex items-center justify-center font-bold rounded-xl transition-all duration-100 select-none relative overflow-hidden";
   
   const variants = {
-    primary: "bg-gradient-to-b from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 active:from-blue-700 active:to-blue-800 text-white shadow-lg shadow-blue-500/25 border border-blue-400/30",
-    secondary: "bg-gradient-to-b from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 active:from-gray-800 active:to-gray-900 text-white shadow-lg shadow-gray-500/25 border border-gray-500/30",
-    action: "bg-gradient-to-b from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 active:from-purple-700 active:to-purple-800 text-white shadow-lg shadow-purple-500/25 border border-purple-400/30"
+    primary: `
+      bg-gradient-to-b from-blue-500 to-blue-700 
+      hover:from-blue-400 hover:to-blue-600 
+      text-white shadow-xl shadow-blue-500/40 
+      border-2 border-blue-400/50
+      ${isPressed ? 'scale-95 shadow-lg shadow-blue-500/60' : 'shadow-xl'}
+    `,
+    secondary: `
+      bg-gradient-to-b from-gray-500 to-gray-700 
+      hover:from-gray-400 hover:to-gray-600 
+      text-white shadow-xl shadow-gray-500/40 
+      border-2 border-gray-400/50
+      ${isPressed ? 'scale-95 shadow-lg shadow-gray-500/60' : 'shadow-xl'}
+    `,
+    action: `
+      bg-gradient-to-b from-purple-500 to-purple-700 
+      hover:from-purple-400 hover:to-purple-600 
+      text-white shadow-xl shadow-purple-500/40 
+      border-2 border-purple-400/50
+      ${isPressed ? 'scale-95 shadow-lg shadow-purple-500/60' : 'shadow-xl'}
+    `,
+    rotate: `
+      bg-gradient-to-b from-orange-500 to-orange-700 
+      hover:from-orange-400 hover:to-orange-600 
+      text-white shadow-xl shadow-orange-500/40 
+      border-2 border-orange-400/50
+      ${isPressed ? 'scale-95 shadow-lg shadow-orange-500/60' : 'shadow-xl'}
+    `,
+    drop: `
+      bg-gradient-to-b from-red-500 to-red-700 
+      hover:from-red-400 hover:to-red-600 
+      text-white shadow-xl shadow-red-500/40 
+      border-2 border-red-400/50
+      ${isPressed ? 'scale-95 shadow-lg shadow-red-500/60' : 'shadow-xl'}
+    `
+  };
+
+  const sizes = {
+    normal: "min-h-[60px] min-w-[60px]",
+    large: "min-h-[70px] min-w-[70px]",
+    wide: "min-h-[50px] min-w-[80px]"
   };
 
   const disabledClasses = "opacity-50 cursor-not-allowed pointer-events-none";
 
-  // When a touch event occurs we call the action immediately and mark that
-  // a touch happened so the following click event (synthesized) is ignored.
   const handleTouchStart = (e) => {
-    // prevent scrolling while interacting with controls
     if (e && e.cancelable) e.preventDefault();
     touchedRef.current = true;
+    setIsPressed(true);
     if (!disabled && onClick) onClick();
+    
+    // Reset press state after animation
+    setTimeout(() => setIsPressed(false), 150);
+  };
+
+  const handleTouchEnd = (e) => {
+    if (e && e.cancelable) e.preventDefault();
+    setTimeout(() => setIsPressed(false), 100);
+  };
+
+  const handleMouseDown = () => {
+    if (!touchedRef.current) {
+      setIsPressed(true);
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsPressed(false);
   };
 
   const handleClick = () => {
-    // If the user already triggered the action via touch, ignore the click
     if (touchedRef.current) {
       touchedRef.current = false;
       return;
@@ -72,6 +127,10 @@ const ControlButton = ({ onClick, children, className = '', disabled = false, va
       type="button"
       onClick={handleClick}
       onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseUp}
       disabled={disabled}
       style={{ 
         touchAction: 'manipulation',
@@ -80,11 +139,16 @@ const ControlButton = ({ onClick, children, className = '', disabled = false, va
       className={`
         ${baseClasses}
         ${variants[variant]}
+        ${sizes[size]}
         ${disabled ? disabledClasses : ''}
         ${className}
       `}
     >
-      {children}
+      {/* Efecto de brillo al presionar */}
+      <div className={`absolute inset-0 bg-white/20 transition-opacity duration-100 ${isPressed ? 'opacity-100' : 'opacity-0'}`}></div>
+      <div className="relative z-10">
+        {children}
+      </div>
     </button>
   );
 };
@@ -105,57 +169,75 @@ const Controls = ({ touchControls, isPlaying, isGameOver, startGame, resetGame }
       
       {/* PRIMERO: Controles de movimiento (solo visible en móvil cuando se está jugando) */}
       {isPlaying && !isGameOver && (
-        <div className="md:hidden bg-gray-800/30 rounded-lg p-3 border border-gray-600/20">
-          {/* Layout compacto en 2 filas */}
-          
-          {/* Fila 1: Rotar y Bajar rápido */}
-          <div className="flex justify-center gap-3 mb-3">
-            <ControlButton 
-              onClick={touchControls.rotate} 
-              className="w-14 h-14 cursor-pointer"
-              variant="action"
-            >
-              <RotateIcon />
-            </ControlButton>
-            
-            <ControlButton 
-              onClick={touchControls.hardDrop} 
-              className="w-14 h-14 cursor-pointer"
-              variant="secondary"
-            >
-              <ArrowDownIcon />
-              <ArrowDownIcon />
-            </ControlButton>
-          </div>
-
-          {/* Fila 2: Controles direccionales */}
-          <div className="flex justify-center items-center gap-2">
+        <div className="md:hidden bg-gradient-to-b from-gray-900/90 to-gray-800/90 rounded-t-none rounded-b-2xl p-5 border-2 border-t-0 border-gray-600/50 backdrop-blur-sm shadow-2xl">
+          {/* Fila 1: Controles direccionales principales */}
+          <div className="flex justify-center items-center gap-4 mb-5">
             <ControlButton 
               onClick={touchControls.moveLeft} 
-              className="w-14 h-12 cursor-pointer"
+              className="cursor-pointer"
+              variant="primary"
+              size="large"
             >
-              <ArrowLeftIcon />
+              <div className="flex flex-col items-center">
+                <ArrowLeftIcon />
+                <span className="text-xs font-bold">←</span>
+              </div>
             </ControlButton>
             
             <ControlButton 
               onClick={touchControls.moveDown} 
-              className="w-14 h-12 cursor-pointer"
+              className="cursor-pointer"
+              variant="primary"
+              size="large"
             >
-              <ArrowDownIcon />
+              <div className="flex flex-col items-center">
+                <ArrowDownIcon />
+                <span className="text-xs font-bold">↓</span>
+              </div>
             </ControlButton>
             
             <ControlButton 
               onClick={touchControls.moveRight} 
-              className="w-14 h-12 cursor-pointer"
+              className="cursor-pointer"
+              variant="primary"
+              size="large"
             >
-              <ArrowRightIcon />
+              <div className="flex flex-col items-center">
+                <ArrowRightIcon />
+                <span className="text-xs font-bold">→</span>
+              </div>
             </ControlButton>
           </div>
 
-          {/* Instrucciones compactas */}
-          <div className="text-center mt-2 text-gray-400 text-xs">
-            Controles táctiles activos
+          {/* Fila 2: Caída rápida y Rotar */}
+          <div className="flex justify-center items-center gap-4 mb-3">
+            <ControlButton 
+              onClick={touchControls.hardDrop} 
+              className="cursor-pointer"
+              variant="drop"
+              size="wide"
+            >
+              <div className="flex items-center gap-2">
+                <ArrowDownIcon />
+               
+                <span className="text-sm font-bold">CAÍDA RÁPIDA</span>
+              </div>
+            </ControlButton>
+
+            <ControlButton 
+              onClick={touchControls.rotate} 
+              className="cursor-pointer"
+              variant="rotate"
+              size="large"
+            >
+              <div className="flex flex-col items-center">
+                <RotateIcon />
+                <span className="text-xs font-bold mt-1">ROTAR</span>
+              </div>
+            </ControlButton>
           </div>
+
+          
         </div>
       )}
 
@@ -165,10 +247,13 @@ const Controls = ({ touchControls, isPlaying, isGameOver, startGame, resetGame }
           <ControlButton 
             onClick={handleStartGameDebug} 
             variant="action" 
-            className="px-8 py-4 text-lg font-bold w-full md:w-auto min-h-[60px] shadow-xl relative z-20 cursor-pointer"
+            size="wide"
+            className="px-8 py-6 text-xl font-bold w-full md:w-auto shadow-xl relative z-20 cursor-pointer"
           >
-            <PlayIcon />
-            <span className="ml-2">🎮 JUGAR</span>
+            <div className="flex items-center gap-3">
+              <PlayIcon />
+              <span>🎮 JUGAR</span>
+            </div>
           </ControlButton>
         )}
         
@@ -176,10 +261,13 @@ const Controls = ({ touchControls, isPlaying, isGameOver, startGame, resetGame }
           <ControlButton 
             onClick={touchControls.pause} 
             variant="secondary" 
-            className="px-4 py-3 text-sm w-full md:w-auto relative z-20 cursor-pointer"
+            size="normal"
+            className="px-6 py-4 text-lg font-bold w-full md:w-auto relative z-20 cursor-pointer"
           >
-            <PauseIcon />
-            <span className="ml-2">Pausa</span>
+            <div className="flex items-center gap-2">
+              <PauseIcon />
+              <span>⏸️ PAUSA</span>
+            </div>
           </ControlButton>
         )}
         
@@ -187,9 +275,12 @@ const Controls = ({ touchControls, isPlaying, isGameOver, startGame, resetGame }
           <ControlButton 
             onClick={resetGame} 
             variant="action" 
-            className="px-6 py-3 text-base w-full md:w-auto min-h-[50px] relative z-20 cursor-pointer"
+            size="normal"
+            className="px-6 py-4 text-lg font-bold w-full md:w-auto relative z-20 cursor-pointer"
           >
-            <span>🔄 Reiniciar</span>
+            <div className="flex items-center gap-2">
+              <span>🔄 REINICIAR</span>
+            </div>
           </ControlButton>
         )}
       </div>

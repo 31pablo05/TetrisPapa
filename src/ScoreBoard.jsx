@@ -35,6 +35,34 @@ const NextPieceDisplay = ({ nextTetromino }) => {
 };
 
 const ScoreBoard = ({ score, level, lines, nextTetromino, isPlaying, isGameOver }) => {
+  // Calcular progreso hacia el siguiente nivel
+  const getProgressToNextLevel = (currentLines, currentLevel) => {
+    const getLinesForLevel = (lvl) => {
+      if (lvl === 1) return 0;
+      if (lvl === 2) return 10;
+      if (lvl === 3) return 25;
+      if (lvl === 4) return 45;
+      if (lvl === 5) return 70;
+      if (lvl === 6) return 100;
+      return 100 + (lvl - 6) * 35;
+    };
+
+    const currentLevelStart = getLinesForLevel(currentLevel);
+    const nextLevelStart = getLinesForLevel(currentLevel + 1);
+    const linesInLevel = currentLines - currentLevelStart;
+    const linesNeeded = nextLevelStart - currentLevelStart;
+    const remaining = nextLevelStart - currentLines;
+
+    return {
+      progress: linesInLevel,
+      needed: linesNeeded,
+      remaining: remaining > 0 ? remaining : 0,
+      percentage: Math.min(100, (linesInLevel / linesNeeded) * 100)
+    };
+  };
+
+  const levelProgress = getProgressToNextLevel(lines, level);
+
   return (
     <div className="scoreboard space-y-4">
       {/* Información de puntuación */}
@@ -47,6 +75,11 @@ const ScoreBoard = ({ score, level, lines, nextTetromino, isPlaying, isGameOver 
         <div className="bg-gradient-to-br from-purple-600/20 to-purple-800/20 rounded-lg p-3 border border-purple-500/30">
           <div className="text-purple-300 text-xs font-medium mb-1">NIVEL</div>
           <div className="text-white text-lg font-bold">{level}</div>
+          {levelProgress.remaining > 0 && (
+            <div className="text-xs text-purple-300 mt-1">
+              -{levelProgress.remaining} líneas
+            </div>
+          )}
         </div>
         
         <div className="bg-gradient-to-br from-green-600/20 to-green-800/20 rounded-lg p-3 border border-green-500/30">
@@ -54,6 +87,22 @@ const ScoreBoard = ({ score, level, lines, nextTetromino, isPlaying, isGameOver 
           <div className="text-white text-lg font-bold">{lines}</div>
         </div>
       </div>
+
+      {/* Barra de progreso del nivel */}
+      {levelProgress.remaining > 0 && (
+        <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-600/30">
+          <div className="text-gray-300 text-xs mb-2">Progreso del Nivel {level}</div>
+          <div className="w-full bg-gray-700 rounded-full h-2">
+            <div 
+              className="bg-gradient-to-r from-purple-500 to-purple-400 h-2 rounded-full transition-all duration-300"
+              style={{ width: `${levelProgress.percentage}%` }}
+            ></div>
+          </div>
+          <div className="text-xs text-gray-400 mt-1 text-center">
+            {levelProgress.progress}/{levelProgress.needed} líneas
+          </div>
+        </div>
+      )}
 
       {/* Siguiente pieza */}
       <NextPieceDisplay nextTetromino={nextTetromino} />

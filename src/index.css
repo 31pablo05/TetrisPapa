@@ -112,14 +112,35 @@ button, input, select, textarea {
   
   /* Controles optimizados para móvil */
   .controls-container {
-    padding: 0.5rem 0;
+    padding: 0;
     touch-action: manipulation;
     margin-top: 0 !important;
   }
   
+  /* Integración perfecta entre GameBoard y Controls */
+  .game-board {
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+  }
+  
   /* Espaciado más compacto entre secciones de controles */
   .controls-container > *:not(:last-child) {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  /* Mejor feedback táctil */
+  .controls-container button:active {
+    transform: scale(0.95) !important;
+    transition: transform 0.1s ease-out !important;
+  }
+  
+  /* Asegurar que los botones sean muy responsivos */
+  .controls-container button {
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    will-change: transform;
   }
   
   /* Asegurar que todos los botones sean bien accesibles en móvil */

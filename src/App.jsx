@@ -71,15 +71,15 @@ function App() {
           {/* Contenedor para GameBoard y Controls en móvil */}
           <div className="md:col-span-2 order-2 flex flex-col items-center">
             {/* GameBoard - Centro */}
-            <div className="w-full max-w-[280px] md:max-w-md mb-2 md:mb-4">
+            <div className="w-full max-w-[280px] md:max-w-md md:mb-4">
               <GameBoard 
                 board={board} 
-                className="w-full aspect-[1/2] shadow-2xl mx-auto"
+                className="w-full aspect-[1/2] shadow-2xl mx-auto rounded-b-none md:rounded-b-lg"
               />
             </div>
             
-            {/* Controls - Justo debajo del GameBoard en móvil */}
-            <div className="md:hidden w-full max-w-[280px]">
+            {/* Controls - Pegados al GameBoard en móvil */}
+            <div className="md:hidden w-full max-w-[280px] -mt-1">
               <Controls
                 touchControls={touchControls}
                 isPlaying={isPlaying}

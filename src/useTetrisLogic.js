@@ -88,7 +88,6 @@ export const useTetrisLogic = () => {
   const [isGameOver, setIsGameOver] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [dropTime, setDropTime] = useState(INITIAL_DROP_TIME);
-  const [gameStartTime, setGameStartTime] = useState(null);
   const [showLevelUp, setShowLevelUp] = useState(false);
   const lastActionRef = useRef(0);
   const LOCK_WINDOW_MS = 300; // ms during which recent player action prevents immediate lock
@@ -106,8 +105,7 @@ export const useTetrisLogic = () => {
     setLevel(1);
     setLines(0);
     setIsGameOver(false);
-  setDropTime(700); // Velocidad inicial (ms per drop)
-    setGameStartTime(Date.now());
+    setDropTime(800); // Velocidad inicial mejorada (ms per drop)
     setShowLevelUp(false);
   }, []);
 
@@ -148,24 +146,48 @@ export const useTetrisLogic = () => {
       
       setBoard(clearedBoard);
       
-      // Actualizar puntuación y estadísticas
+          // Actualizar puntuación y estadísticas
       if (linesCleared > 0) {
         const points = linesCleared * 100 * level;
         setScore(prev => prev + points);
         setLines(prev => {
           const newLines = prev + linesCleared;
           
-          // Calcular nuevo nivel basado en líneas (cada 5 líneas para progresión más rápida)
-          const newLevel = Math.floor(newLines / 5) + 1;
+          // Sistema de niveles mejorado - progresión más equilibrada
+          // Nivel 1: 0-9 líneas (10 líneas para pasar)
+          // Nivel 2: 10-24 líneas (15 líneas para pasar) 
+          // Nivel 3: 25-44 líneas (20 líneas para pasar)
+          // Y así sucesivamente...
+          const calculateLevel = (totalLines) => {
+            if (totalLines < 10) return 1;
+            if (totalLines < 25) return 2;
+            if (totalLines < 45) return 3;
+            if (totalLines < 70) return 4;
+            if (totalLines < 100) return 5;
+            // Para niveles superiores: cada 35 líneas adicionales
+            return 6 + Math.floor((totalLines - 100) / 35);
+          };
+          
+          const newLevel = calculateLevel(newLines);
+          
           if (newLevel > level) {
             setLevel(newLevel);
-            // Progresión más agresiva: cada nivel reduce 150ms (en lugar de 80ms)
-            const newDropTime = Math.max(80, 800 - (newLevel - 1) * 150);
-            setDropTime(newDropTime);
+            
+            // Velocidad progresiva más equilibrada
+            // Nivel 1: 800ms, Nivel 2: 650ms, Nivel 3: 500ms, etc.
+            const calculateDropTime = (lvl) => {
+              if (lvl <= 1) return 800;
+              if (lvl <= 3) return 800 - (lvl - 1) * 150;  // 800, 650, 500
+              if (lvl <= 6) return 500 - (lvl - 3) * 80;   // 420, 340, 260
+              if (lvl <= 10) return 260 - (lvl - 6) * 40;  // 220, 180, 140, 100
+              return Math.max(50, 100 - (lvl - 10) * 10);  // mínimo 50ms
+            };
+            
+            setDropTime(calculateDropTime(newLevel));
             
             // Mostrar notificación de nivel
             setShowLevelUp(true);
-            setTimeout(() => setShowLevelUp(false), 2000);
+            setTimeout(() => setShowLevelUp(false), 2500);
           }
           
           return newLines;
@@ -260,31 +282,7 @@ export const useTetrisLogic = () => {
     return boardWithPiece;
   }, [board, currentTetromino]);
 
-  // Sistema de nivel automático basado en tiempo
-  useEffect(() => {
-    if (!isPlaying || isGameOver || !gameStartTime) return;
 
-    // Subir nivel automáticamente cada 20 segundos para hacer la progresión más notoria
-    const levelUpInterval = setInterval(() => {
-      const elapsed = Date.now() - gameStartTime; // ms
-      const autoLevel = Math.floor(elapsed / 20000) + 1; // +1 so initial level is 1
-
-      setLevel(currentLevel => {
-        if (autoLevel > currentLevel) {
-          const newDropTime = Math.max(50, 700 - (autoLevel - 1) * 200); // reducción más agresiva
-          setDropTime(newDropTime);
-
-          setShowLevelUp(true);
-          setTimeout(() => setShowLevelUp(false), 1800);
-
-          return autoLevel;
-        }
-        return currentLevel;
-      });
-    }, 20000); // check every 20s
-
-    return () => clearInterval(levelUpInterval);
-  }, [isPlaying, isGameOver, gameStartTime]);
 
   // Game loop automático con timer independiente
   useEffect(() => {
