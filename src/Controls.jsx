@@ -83,8 +83,9 @@ const ControlButton = ({ onClick, children, className = '', disabled = false, va
 
   const sizes = {
     normal: "min-h-[60px] min-w-[60px]",
-    large: "min-h-[70px] min-w-[70px]",
-    wide: "min-h-[50px] min-w-[80px]"
+    large: "min-h-[80px] min-w-[80px]",
+    wide: "min-h-[60px] min-w-[120px]",
+    extraWide: "min-h-[70px] min-w-[140px]"
   };
 
   const disabledClasses = "opacity-50 cursor-not-allowed pointer-events-none";
@@ -169,9 +170,9 @@ const Controls = ({ touchControls, isPlaying, isGameOver, startGame, resetGame }
       
       {/* PRIMERO: Controles de movimiento (solo visible en móvil cuando se está jugando) */}
       {isPlaying && !isGameOver && (
-        <div className="md:hidden bg-gradient-to-b from-gray-900/90 to-gray-800/90 rounded-t-none rounded-b-2xl p-5 border-2 border-t-0 border-gray-600/50 backdrop-blur-sm shadow-2xl">
-          {/* Fila 1: Controles direccionales principales */}
-          <div className="flex justify-center items-center gap-4 mb-5">
+        <div className="md:hidden bg-gradient-to-b from-gray-900/90 to-gray-800/90 rounded-t-none rounded-b-2xl p-6 border-2 border-t-0 border-gray-600/50 backdrop-blur-sm shadow-2xl">
+          {/* Fila 1: Controles direccionales principales - Distribuidos */}
+          <div className="flex justify-between items-center mb-6 px-4">
             <ControlButton 
               onClick={touchControls.moveLeft} 
               className="cursor-pointer"
@@ -180,7 +181,7 @@ const Controls = ({ touchControls, isPlaying, isGameOver, startGame, resetGame }
             >
               <div className="flex flex-col items-center">
                 <ArrowLeftIcon />
-                <span className="text-xs font-bold">←</span>
+                <span className="text-sm font-bold">←</span>
               </div>
             </ControlButton>
             
@@ -192,7 +193,7 @@ const Controls = ({ touchControls, isPlaying, isGameOver, startGame, resetGame }
             >
               <div className="flex flex-col items-center">
                 <ArrowDownIcon />
-                <span className="text-xs font-bold">↓</span>
+                <span className="text-sm font-bold">↓</span>
               </div>
             </ControlButton>
             
@@ -204,22 +205,22 @@ const Controls = ({ touchControls, isPlaying, isGameOver, startGame, resetGame }
             >
               <div className="flex flex-col items-center">
                 <ArrowRightIcon />
-                <span className="text-xs font-bold">→</span>
+                <span className="text-sm font-bold">→</span>
               </div>
             </ControlButton>
           </div>
 
-          {/* Fila 2: Caída rápida y Rotar */}
-          <div className="flex justify-center items-center gap-4 mb-3">
+          {/* Fila 2: Caída rápida y Rotar - Centrados con más espacio */}
+          <div className="flex justify-center items-center gap-6 mb-4">
             <ControlButton 
               onClick={touchControls.hardDrop} 
               className="cursor-pointer"
               variant="drop"
-              size="wide"
+              size="extraWide"
             >
               <div className="flex items-center gap-2">
                 <ArrowDownIcon />
-               
+                <ArrowDownIcon />
                 <span className="text-sm font-bold">CAÍDA RÁPIDA</span>
               </div>
             </ControlButton>
@@ -232,7 +233,7 @@ const Controls = ({ touchControls, isPlaying, isGameOver, startGame, resetGame }
             >
               <div className="flex flex-col items-center">
                 <RotateIcon />
-                <span className="text-xs font-bold mt-1">ROTAR</span>
+                <span className="text-sm font-bold mt-1">ROTAR</span>
               </div>
             </ControlButton>
           </div>

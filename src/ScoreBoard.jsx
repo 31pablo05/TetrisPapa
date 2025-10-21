@@ -34,7 +34,7 @@ const NextPieceDisplay = ({ nextTetromino }) => {
   );
 };
 
-const ScoreBoard = ({ score, level, lines, nextTetromino, isPlaying, isGameOver }) => {
+const ScoreBoard = ({ score, level, lines, nextTetromino, isPlaying, isGameOver, bestScore, bestLevel, bestLines, resetBestScore }) => {
   // Calcular progreso hacia el siguiente nivel
   const getProgressToNextLevel = (currentLines, currentLevel) => {
     const getLinesForLevel = (lvl) => {
@@ -65,8 +65,8 @@ const ScoreBoard = ({ score, level, lines, nextTetromino, isPlaying, isGameOver 
 
   return (
     <div className="scoreboard space-y-4">
-      {/* Información de puntuación */}
-      <div className="grid grid-cols-3 md:grid-cols-1 gap-3 md:gap-4">
+      {/* Información de puntuación - Mejor distribución en móvil */}
+      <div className="grid grid-cols-3 md:grid-cols-1 gap-2 md:gap-4">
         <div className="bg-gradient-to-br from-blue-600/20 to-blue-800/20 rounded-lg p-3 border border-blue-500/30">
           <div className="text-blue-300 text-xs font-medium mb-1">PUNTOS</div>
           <div className="text-white text-lg font-bold">{score.toLocaleString()}</div>
@@ -101,6 +101,33 @@ const ScoreBoard = ({ score, level, lines, nextTetromino, isPlaying, isGameOver 
           <div className="text-xs text-gray-400 mt-1 text-center">
             {levelProgress.progress}/{levelProgress.needed} líneas
           </div>
+        </div>
+      )}
+
+      {/* Mejor Puntaje */}
+      {bestScore > 0 && (
+        <div className="bg-gradient-to-br from-yellow-600/20 to-yellow-800/20 rounded-lg p-3 border border-yellow-500/30">
+          <h3 className="text-yellow-300 text-xs font-semibold mb-2 text-center">🏆 RÉCORD PERSONAL</h3>
+          <div className="grid grid-cols-3 gap-2 text-center">
+            <div>
+              <div className="text-yellow-200 text-xs">Puntos</div>
+              <div className="text-white text-sm font-bold">{bestScore.toLocaleString()}</div>
+            </div>
+            <div>
+              <div className="text-yellow-200 text-xs">Nivel</div>
+              <div className="text-white text-sm font-bold">{bestLevel}</div>
+            </div>
+            <div>
+              <div className="text-yellow-200 text-xs">Líneas</div>
+              <div className="text-white text-sm font-bold">{bestLines}</div>
+            </div>
+          </div>
+          <button
+            onClick={resetBestScore}
+            className="mt-2 w-full text-xs text-yellow-400 hover:text-yellow-300 transition-colors"
+          >
+            Resetear récord
+          </button>
         </div>
       )}
 

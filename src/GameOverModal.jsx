@@ -1,10 +1,11 @@
 import React from 'react';
 
-const GameOverModal = ({ isVisible, score, level, lines, onRestart, onClose }) => {
+const GameOverModal = ({ isVisible, score, level, lines, bestScore, isNewRecord, onRestart, onClose }) => {
   if (!isVisible) return null;
 
   // Función para determinar el mensaje basado en el puntaje
-  const getScoreMessage = (score) => {
+  const getScoreMessage = (score, isNewRecord) => {
+    if (isNewRecord) return "🎉 ¡NUEVO RÉCORD PERSONAL! 🎉";
     if (score >= 50000) return "¡MAESTRO DEL TETRIS!";
     if (score >= 20000) return "¡EXCELENTE JUGADOR!";
     if (score >= 10000) return "¡MUY BIEN!";
@@ -18,17 +19,36 @@ const GameOverModal = ({ isVisible, score, level, lines, onRestart, onClose }) =
       <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl shadow-2xl border border-gray-600/50 max-w-sm w-full mx-4 transform animate-pulse">
         
         {/* Header */}
-        <div className="bg-gradient-to-r from-red-600 to-red-700 rounded-t-2xl p-4 text-center">
-          <h2 className="text-white text-2xl font-bold">GAME OVER</h2>
-          <div className="text-red-200 text-sm mt-1">{getScoreMessage(score)}</div>
+        <div className={`rounded-t-2xl p-4 text-center ${
+          isNewRecord 
+            ? 'bg-gradient-to-r from-yellow-500 to-orange-500' 
+            : 'bg-gradient-to-r from-red-600 to-red-700'
+        }`}>
+          <h2 className="text-white text-2xl font-bold">
+            {isNewRecord ? '🏆 NUEVO RÉCORD 🏆' : 'GAME OVER'}
+          </h2>
+          <div className={`text-sm mt-1 ${isNewRecord ? 'text-yellow-100' : 'text-red-200'}`}>
+            {getScoreMessage(score, isNewRecord)}
+          </div>
         </div>
 
         {/* Estadísticas */}
         <div className="p-6 space-y-4">
           <div className="grid grid-cols-2 gap-4">
-            <div className="bg-gray-700/50 rounded-lg p-3 text-center">
+            <div className={`rounded-lg p-3 text-center ${
+              isNewRecord 
+                ? 'bg-yellow-600/20 border border-yellow-500/30' 
+                : 'bg-gray-700/50'
+            }`}>
               <div className="text-gray-400 text-xs font-medium mb-1">PUNTUACIÓN FINAL</div>
-              <div className="text-white text-xl font-bold">{score.toLocaleString()}</div>
+              <div className={`text-xl font-bold ${isNewRecord ? 'text-yellow-300' : 'text-white'}`}>
+                {score.toLocaleString()}
+              </div>
+              {bestScore > 0 && !isNewRecord && (
+                <div className="text-xs text-gray-500 mt-1">
+                  Récord: {bestScore.toLocaleString()}
+                </div>
+              )}
             </div>
             
             <div className="bg-gray-700/50 rounded-lg p-3 text-center">

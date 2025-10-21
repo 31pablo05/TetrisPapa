@@ -108,6 +108,7 @@ button, input, select, textarea {
   /* Espaciado optimizado entre elementos */
   .game-board {
     margin-bottom: 0.75rem;
+    max-width: 95vw;
   }
   
   /* Controles optimizados para móvil */
@@ -141,6 +142,18 @@ button, input, select, textarea {
     -webkit-touch-callout: none;
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
     will-change: transform;
+  }
+  
+  /* Optimización para pantallas muy anchas en móvil */
+  @media (min-width: 480px) and (max-width: 768px) {
+    .game-board {
+      max-width: 400px;
+    }
+    
+    .controls-container button {
+      min-height: 70px;
+      min-width: 70px;
+    }
   }
   
   /* Asegurar que todos los botones sean bien accesibles en móvil */

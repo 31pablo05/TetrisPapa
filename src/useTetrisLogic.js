@@ -7,6 +7,7 @@ import {
   rotateTetromino,
   TETROMINO_SHAPES 
 } from './tetrominoShapes';
+import { useBestScore } from './useLocalStorage';
 
 // Función para crear un tablero vacío
 const createEmptyBoard = () => {
@@ -89,8 +90,12 @@ export const useTetrisLogic = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [dropTime, setDropTime] = useState(INITIAL_DROP_TIME);
   const [showLevelUp, setShowLevelUp] = useState(false);
+  const [isNewRecord, setIsNewRecord] = useState(false);
   const lastActionRef = useRef(0);
   const LOCK_WINDOW_MS = 300; // ms during which recent player action prevents immediate lock
+
+  // Hook para manejar el mejor puntaje
+  const { bestScore, bestLevel, bestLines, updateBestScore, resetBestScore } = useBestScore();
 
   // Inicializar el juego
   const initializeGame = useCallback(() => {
@@ -198,6 +203,11 @@ export const useTetrisLogic = () => {
       if (currentTetromino.y <= 0) {
         setIsGameOver(true);
         setIsPlaying(false);
+        
+        // Verificar si se batió un récord
+        const isRecord = updateBestScore(score, level, lines);
+        setIsNewRecord(isRecord);
+        
         return;
       }
       
@@ -205,7 +215,7 @@ export const useTetrisLogic = () => {
       setCurrentTetromino(nextTetromino);
       setNextTetromino(getRandomTetromino());
     }
-  }, [board, currentTetromino, isGameOver, isPlaying, level, nextTetromino]);
+  }, [board, currentTetromino, isGameOver, isPlaying, level, nextTetromino, lines, score, updateBestScore]);
 
   // Keep a ref to the latest dropTetromino so intervals/loops call the up-to-date function
   const dropRef = useRef(dropTetromino);
@@ -311,6 +321,13 @@ export const useTetrisLogic = () => {
     isGameOver,
     isPlaying,
     showLevelUp,
+    isNewRecord,
+    
+    // Mejor puntaje
+    bestScore,
+    bestLevel,
+    bestLines,
+    resetBestScore,
     
     // Acciones
     startGame,
