@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 
 // Iconos simples usando CSS
 const ArrowLeftIcon = () => (
@@ -38,7 +38,8 @@ const PlayIcon = () => (
 );
 
 const ControlButton = ({ onClick, children, className = '', disabled = false, variant = 'primary' }) => {
-  const baseClasses = "flex items-center justify-center font-semibold rounded-lg transition-all duration-150 active:scale-95 select-none touch-manipulation";
+  const touchedRef = useRef(false);
+  const baseClasses = "flex items-center justify-center font-semibold rounded-lg transition-all duration-150 active:scale-95 select-none";
   
   const variants = {
     primary: "bg-gradient-to-b from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 active:from-blue-700 active:to-blue-800 text-white shadow-lg shadow-blue-500/25 border border-blue-400/30",
@@ -48,20 +49,27 @@ const ControlButton = ({ onClick, children, className = '', disabled = false, va
 
   const disabledClasses = "opacity-50 cursor-not-allowed pointer-events-none";
 
-  const handleClick = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (!disabled && onClick) {
-      onClick();
-    }
+  // When a touch event occurs we call the action immediately and mark that
+  // a touch happened so the following click event (synthesized) is ignored.
+  const handleTouchStart = (e) => {
+    // prevent scrolling while interacting with controls
+    if (e && e.cancelable) e.preventDefault();
+    touchedRef.current = true;
+    if (!disabled && onClick) onClick();
   };
 
-  const handleTouchStart = (e) => {
-    e.preventDefault();
+  const handleClick = () => {
+    // If the user already triggered the action via touch, ignore the click
+    if (touchedRef.current) {
+      touchedRef.current = false;
+      return;
+    }
+    if (!disabled && onClick) onClick();
   };
 
   return (
     <button
+      type="button"
       onClick={handleClick}
       onTouchStart={handleTouchStart}
       disabled={disabled}
@@ -93,8 +101,65 @@ const Controls = ({ touchControls, isPlaying, isGameOver, startGame, resetGame }
   };
 
   return (
-    <div className="controls-container space-y-4">
-      {/* Controles de juego (Start/Pause/Reset) */}
+    <div className="controls-container space-y-3">
+      
+      {/* PRIMERO: Controles de movimiento (solo visible en móvil cuando se está jugando) */}
+      {isPlaying && !isGameOver && (
+        <div className="md:hidden bg-gray-800/30 rounded-lg p-3 border border-gray-600/20">
+          {/* Layout compacto en 2 filas */}
+          
+          {/* Fila 1: Rotar y Bajar rápido */}
+          <div className="flex justify-center gap-3 mb-3">
+            <ControlButton 
+              onClick={touchControls.rotate} 
+              className="w-14 h-14 cursor-pointer"
+              variant="action"
+            >
+              <RotateIcon />
+            </ControlButton>
+            
+            <ControlButton 
+              onClick={touchControls.hardDrop} 
+              className="w-14 h-14 cursor-pointer"
+              variant="secondary"
+            >
+              <ArrowDownIcon />
+              <ArrowDownIcon />
+            </ControlButton>
+          </div>
+
+          {/* Fila 2: Controles direccionales */}
+          <div className="flex justify-center items-center gap-2">
+            <ControlButton 
+              onClick={touchControls.moveLeft} 
+              className="w-14 h-12 cursor-pointer"
+            >
+              <ArrowLeftIcon />
+            </ControlButton>
+            
+            <ControlButton 
+              onClick={touchControls.moveDown} 
+              className="w-14 h-12 cursor-pointer"
+            >
+              <ArrowDownIcon />
+            </ControlButton>
+            
+            <ControlButton 
+              onClick={touchControls.moveRight} 
+              className="w-14 h-12 cursor-pointer"
+            >
+              <ArrowRightIcon />
+            </ControlButton>
+          </div>
+
+          {/* Instrucciones compactas */}
+          <div className="text-center mt-2 text-gray-400 text-xs">
+            Controles táctiles activos
+          </div>
+        </div>
+      )}
+
+      {/* SEGUNDO: Controles de juego (Start/Pause/Reset) */}
       <div className="flex flex-wrap gap-3 justify-center">
         {!isPlaying && !isGameOver && (
           <ControlButton 
@@ -128,66 +193,6 @@ const Controls = ({ touchControls, isPlaying, isGameOver, startGame, resetGame }
           </ControlButton>
         )}
       </div>
-
-      {/* Controles de movimiento (solo visible en móvil cuando se está jugando) */}
-      {isPlaying && !isGameOver && (
-        <div className="md:hidden">
-          {/* Fila superior: Rotar */}
-          <div className="flex justify-center mb-4">
-            <ControlButton 
-              onClick={touchControls.rotate} 
-              className="w-16 h-16 cursor-pointer"
-              variant="action"
-            >
-              <RotateIcon />
-            </ControlButton>
-          </div>
-
-          {/* Fila media: Izquierda y Derecha */}
-          <div className="flex justify-center gap-4 mb-4">
-            <ControlButton 
-              onClick={touchControls.moveLeft} 
-              className="w-16 h-16 cursor-pointer"
-            >
-              <ArrowLeftIcon />
-            </ControlButton>
-            
-            <div className="w-16"></div> {/* Espacio en el medio */}
-            
-            <ControlButton 
-              onClick={touchControls.moveRight} 
-              className="w-16 h-16 cursor-pointer"
-            >
-              <ArrowRightIcon />
-            </ControlButton>
-          </div>
-
-          {/* Fila inferior: Bajar */}
-          <div className="flex justify-center gap-2">
-            <ControlButton 
-              onClick={touchControls.moveDown} 
-              className="w-20 h-12 text-sm cursor-pointer"
-            >
-              <ArrowDownIcon />
-              <span className="ml-1">Bajar</span>
-            </ControlButton>
-            
-            <ControlButton 
-              onClick={touchControls.hardDrop} 
-              className="w-20 h-12 text-sm cursor-pointer"
-              variant="secondary"
-            >
-              <ArrowDownIcon />
-              <ArrowDownIcon />
-            </ControlButton>
-          </div>
-
-          {/* Instrucciones para móviles */}
-          <div className="text-center mt-4 text-gray-400 text-xs">
-            Usa los botones para controlar las piezas
-          </div>
-        </div>
-      )}
 
       {/* Instrucciones para desktop */}
       <div className="hidden md:block bg-gray-800/50 rounded-lg p-3 border border-gray-600/30">

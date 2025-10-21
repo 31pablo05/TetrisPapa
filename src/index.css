@@ -100,10 +100,26 @@ button, input, select, textarea {
     touch-action: manipulation;
   }
   
-  /* Espaciado extra en móvil para asegurar que todo sea accesible */
+  /* Layout optimizado para móvil */
+  .container {
+    padding-bottom: 2rem !important;
+  }
+  
+  /* Espaciado optimizado entre elementos */
+  .game-board {
+    margin-bottom: 0.75rem;
+  }
+  
+  /* Controles optimizados para móvil */
   .controls-container {
-    padding-bottom: 20px;
+    padding: 0.5rem 0;
     touch-action: manipulation;
+    margin-top: 0 !important;
+  }
+  
+  /* Espaciado más compacto entre secciones de controles */
+  .controls-container > *:not(:last-child) {
+    margin-bottom: 0.5rem;
   }
   
   /* Asegurar que todos los botones sean bien accesibles en móvil */
@@ -128,6 +144,18 @@ button, input, select, textarea {
   
   .fixed.inset-0 button {
     z-index: 60;
+  }
+  
+  /* Viewport optimizado para móvil */
+  .min-h-screen {
+    min-height: 100vh;
+    min-height: 100dvh; /* Soporte para dispositivos móviles modernos */
+  }
+  
+  /* Asegurar que el contenido no se corte */
+  .container.mx-auto {
+    max-height: none !important;
+    overflow: visible !important;
   }
 }
 

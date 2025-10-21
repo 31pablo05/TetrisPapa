@@ -54,9 +54,9 @@ function App() {
         </div>
 
         {/* Layout principal */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6 items-start">
+        <div className="flex flex-col md:grid md:grid-cols-4 gap-4 md:gap-6 md:items-start">
           
-          {/* Scoreboard */}
+          {/* Scoreboard - Arriba en móvil, izquierda en desktop */}
           <div className="md:col-span-1 order-1">
             <ScoreBoard
               score={score}
@@ -68,18 +68,30 @@ function App() {
             />
           </div>
 
-          {/* GameBoard - Centro */}
-          <div className="md:col-span-2 order-2 flex justify-center mb-4 md:mb-0">
-            <div className="w-full max-w-[280px] md:max-w-md">
+          {/* Contenedor para GameBoard y Controls en móvil */}
+          <div className="md:col-span-2 order-2 flex flex-col items-center">
+            {/* GameBoard - Centro */}
+            <div className="w-full max-w-[280px] md:max-w-md mb-2 md:mb-4">
               <GameBoard 
                 board={board} 
                 className="w-full aspect-[1/2] shadow-2xl mx-auto"
               />
             </div>
+            
+            {/* Controls - Justo debajo del GameBoard en móvil */}
+            <div className="md:hidden w-full max-w-[280px]">
+              <Controls
+                touchControls={touchControls}
+                isPlaying={isPlaying}
+                isGameOver={isGameOver}
+                startGame={startGame}
+                resetGame={resetGame}
+              />
+            </div>
           </div>
 
-          {/* Controls */}
-          <div className="md:col-span-1 order-3">
+          {/* Controls - Solo visible en desktop */}
+          <div className="hidden md:block md:col-span-1 order-3">
             <Controls
               touchControls={touchControls}
               isPlaying={isPlaying}
