@@ -170,18 +170,18 @@ const Controls = ({ touchControls, isPlaying, isGameOver, startGame, resetGame }
       
       {/* PRIMERO: Controles de movimiento (solo visible en móvil cuando se está jugando) */}
       {isPlaying && !isGameOver && (
-        <div className="md:hidden bg-gradient-to-b from-gray-900/90 to-gray-800/90 rounded-t-none rounded-b-2xl p-6 border-2 border-t-0 border-gray-600/50 backdrop-blur-sm shadow-2xl">
-          {/* Fila 1: Controles direccionales principales - Distribuidos */}
-          <div className="flex justify-between items-center mb-6 px-4">
+        <div className="md:hidden bg-gradient-to-b from-gray-900/90 to-gray-800/90 rounded-t-none rounded-b-2xl p-3 border-2 border-t-0 border-gray-600/50 backdrop-blur-sm shadow-2xl">
+          {/* Fila 1: Controles direccionales - Compactos */}
+          <div className="flex justify-between items-center mb-3 px-2">
             <ControlButton 
               onClick={touchControls.moveLeft} 
               className="cursor-pointer"
               variant="primary"
-              size="large"
+              size="normal"
             >
               <div className="flex flex-col items-center">
                 <ArrowLeftIcon />
-                <span className="text-sm font-bold">←</span>
+                <span className="text-xs font-bold">←</span>
               </div>
             </ControlButton>
             
@@ -189,11 +189,11 @@ const Controls = ({ touchControls, isPlaying, isGameOver, startGame, resetGame }
               onClick={touchControls.moveDown} 
               className="cursor-pointer"
               variant="primary"
-              size="large"
+              size="normal"
             >
               <div className="flex flex-col items-center">
                 <ArrowDownIcon />
-                <span className="text-sm font-bold">↓</span>
+                <span className="text-xs font-bold">↓</span>
               </div>
             </ControlButton>
             
@@ -201,27 +201,27 @@ const Controls = ({ touchControls, isPlaying, isGameOver, startGame, resetGame }
               onClick={touchControls.moveRight} 
               className="cursor-pointer"
               variant="primary"
-              size="large"
+              size="normal"
             >
               <div className="flex flex-col items-center">
                 <ArrowRightIcon />
-                <span className="text-sm font-bold">→</span>
+                <span className="text-xs font-bold">→</span>
               </div>
             </ControlButton>
           </div>
 
-          {/* Fila 2: Caída rápida y Rotar - Centrados con más espacio */}
-          <div className="flex justify-center items-center gap-6 mb-4">
+          {/* Fila 2: Caída rápida y Rotar - Compactos */}
+          <div className="flex justify-center items-center gap-3 mb-2">
             <ControlButton 
               onClick={touchControls.hardDrop} 
               className="cursor-pointer"
               variant="drop"
-              size="extraWide"
+              size="wide"
             >
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
                 <ArrowDownIcon />
                 <ArrowDownIcon />
-                <span className="text-sm font-bold">CAÍDA RÁPIDA</span>
+                <span className="text-xs font-bold">CAÍDA</span>
               </div>
             </ControlButton>
 
@@ -229,16 +229,14 @@ const Controls = ({ touchControls, isPlaying, isGameOver, startGame, resetGame }
               onClick={touchControls.rotate} 
               className="cursor-pointer"
               variant="rotate"
-              size="large"
+              size="normal"
             >
               <div className="flex flex-col items-center">
                 <RotateIcon />
-                <span className="text-sm font-bold mt-1">ROTAR</span>
+                <span className="text-xs font-bold">ROTAR</span>
               </div>
             </ControlButton>
           </div>
-
-          
         </div>
       )}
 

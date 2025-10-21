@@ -91,13 +91,26 @@ button, input, select, textarea {
   }
   
   body {
-    /* Permitir scroll vertical en móvil */
+    /* Scroll optimizado para móvil */
     overflow-y: auto;
     overflow-x: hidden;
     /* Mejorar el scroll en iOS */
     -webkit-overflow-scrolling: touch;
+    /* Scroll momentum nativo */
+    overscroll-behavior-y: contain;
     /* Evitar el zoom al tocar inputs/botones */
-    touch-action: manipulation;
+    touch-action: pan-y;
+  }
+  
+  /* Optimizar altura para evitar cortes */
+  html {
+    height: 100%;
+    overflow-y: auto;
+  }
+  
+  body {
+    min-height: 100%;
+    position: relative;
   }
   
   /* Layout optimizado para móvil */

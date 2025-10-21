@@ -65,26 +65,26 @@ const ScoreBoard = ({ score, level, lines, nextTetromino, isPlaying, isGameOver,
 
   return (
     <div className="scoreboard space-y-4">
-      {/* Información de puntuación - Mejor distribución en móvil */}
-      <div className="grid grid-cols-3 md:grid-cols-1 gap-2 md:gap-4">
-        <div className="bg-gradient-to-br from-blue-600/20 to-blue-800/20 rounded-lg p-3 border border-blue-500/30">
+      {/* Información de puntuación - Compacto en móvil */}
+      <div className="grid grid-cols-3 md:grid-cols-1 gap-1 md:gap-4">
+        <div className="bg-gradient-to-br from-blue-600/20 to-blue-800/20 rounded-lg p-2 md:p-3 border border-blue-500/30">
           <div className="text-blue-300 text-xs font-medium mb-1">PUNTOS</div>
-          <div className="text-white text-lg font-bold">{score.toLocaleString()}</div>
+          <div className="text-white text-sm md:text-lg font-bold">{score.toLocaleString()}</div>
         </div>
         
-        <div className="bg-gradient-to-br from-purple-600/20 to-purple-800/20 rounded-lg p-3 border border-purple-500/30">
+        <div className="bg-gradient-to-br from-purple-600/20 to-purple-800/20 rounded-lg p-2 md:p-3 border border-purple-500/30">
           <div className="text-purple-300 text-xs font-medium mb-1">NIVEL</div>
-          <div className="text-white text-lg font-bold">{level}</div>
+          <div className="text-white text-sm md:text-lg font-bold">{level}</div>
           {levelProgress.remaining > 0 && (
-            <div className="text-xs text-purple-300 mt-1">
+            <div className="text-xs text-purple-300 mt-1 hidden md:block">
               -{levelProgress.remaining} líneas
             </div>
           )}
         </div>
         
-        <div className="bg-gradient-to-br from-green-600/20 to-green-800/20 rounded-lg p-3 border border-green-500/30">
+        <div className="bg-gradient-to-br from-green-600/20 to-green-800/20 rounded-lg p-2 md:p-3 border border-green-500/30">
           <div className="text-green-300 text-xs font-medium mb-1">LÍNEAS</div>
-          <div className="text-white text-lg font-bold">{lines}</div>
+          <div className="text-white text-sm md:text-lg font-bold">{lines}</div>
         </div>
       </div>
 

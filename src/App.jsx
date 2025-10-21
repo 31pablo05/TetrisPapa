@@ -47,49 +47,51 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      <div className="container mx-auto px-2 md:px-4 py-4 max-w-6xl">
+      <div className="container mx-auto px-2 md:px-4 py-2 md:py-4 max-w-6xl">
         
-        {/* Header */}
-        <div className="text-center mb-4 md:mb-6">
-          <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">
+        {/* Header compacto en móvil */}
+        <div className="text-center mb-2 md:mb-6">
+          <h1 className="text-3xl md:text-6xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-1 md:mb-2">
             TETRIS
           </h1>
-          <p className="text-gray-400 text-sm md:text-base">
+          <p className="text-gray-400 text-xs md:text-base hidden md:block">
             Juego clásico con diseño moderno
           </p>
         </div>
 
-        {/* Layout principal */}
-        <div className="flex flex-col md:grid md:grid-cols-4 gap-4 md:gap-6 md:items-start">
+        {/* Layout principal optimizado */}
+        <div className="flex flex-col md:grid md:grid-cols-4 gap-2 md:gap-6 md:items-start">
           
-          {/* Scoreboard - Arriba en móvil, izquierda en desktop */}
+          {/* Scoreboard - Compacto en móvil */}
           <div className="md:col-span-1 order-1">
-            <ScoreBoard
-              score={score}
-              level={level}
-              lines={lines}
-              nextTetromino={nextTetromino}
-              isPlaying={isPlaying}
-              isGameOver={isGameOver}
-              bestScore={bestScore}
-              bestLevel={bestLevel}
-              bestLines={bestLines}
-              resetBestScore={resetBestScore}
-            />
+            <div className="md:sticky md:top-4">
+              <ScoreBoard
+                score={score}
+                level={level}
+                lines={lines}
+                nextTetromino={nextTetromino}
+                isPlaying={isPlaying}
+                isGameOver={isGameOver}
+                bestScore={bestScore}
+                bestLevel={bestLevel}
+                bestLines={bestLines}
+                resetBestScore={resetBestScore}
+              />
+            </div>
           </div>
 
-          {/* Contenedor para GameBoard y Controls en móvil */}
-          <div className="md:col-span-2 order-2 flex flex-col items-center">
-            {/* GameBoard - Centro - Más ancho en móvil */}
-            <div className="w-full max-w-[95vw] sm:max-w-[400px] md:max-w-md md:mb-4 px-2 md:px-0">
+          {/* Contenedor principal del juego */}
+          <div className="md:col-span-2 order-2 flex flex-col items-center min-h-0">
+            {/* GameBoard optimizado para viewport */}
+            <div className="w-full max-w-[95vw] sm:max-w-[380px] md:max-w-md px-2 md:px-0">
               <GameBoard 
                 board={board} 
-                className="w-full aspect-[1/2] shadow-2xl mx-auto rounded-b-none md:rounded-b-lg"
+                className="w-full aspect-[1/1.8] shadow-2xl mx-auto rounded-b-none md:rounded-b-lg"
               />
             </div>
             
-            {/* Controls - Pegados al GameBoard en móvil - Más ancho */}
-            <div className="md:hidden w-full max-w-[95vw] sm:max-w-[400px] -mt-1 px-2 md:px-0">
+            {/* Controls compactos pegados al GameBoard */}
+            <div className="md:hidden w-full max-w-[95vw] sm:max-w-[380px] px-2 md:px-0 -mt-px">
               <Controls
                 touchControls={touchControls}
                 isPlaying={isPlaying}
@@ -113,10 +115,10 @@ function App() {
 
         </div>
 
-        {/* Footer con padding bottom extra para móvil */}
-        <div className="text-center mt-6 pb-8 md:pb-2 text-gray-500 text-xs">
-          <p>Hecho con ❤️ usando React + Vite + Tailwind CSS</p>
-          <p className="mt-2">
+        {/* Footer compacto */}
+        <div className="text-center mt-2 md:mt-6 pb-4 md:pb-2 text-gray-500 text-xs">
+          <p className="hidden md:block">Hecho con ❤️ usando React + Vite + Tailwind CSS</p>
+          <p className="mt-1">
             Desarrollado por{' '}
             <a 
               href="https://devcraftpablo.online/" 
