@@ -41,17 +41,34 @@ const ControlButton = ({ onClick, children, className = '', disabled = false, va
   const baseClasses = "flex items-center justify-center font-semibold rounded-lg transition-all duration-150 active:scale-95 select-none touch-manipulation";
   
   const variants = {
-    primary: "bg-gradient-to-b from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg shadow-blue-500/25 border border-blue-400/30",
-    secondary: "bg-gradient-to-b from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white shadow-lg shadow-gray-500/25 border border-gray-500/30",
-    action: "bg-gradient-to-b from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white shadow-lg shadow-purple-500/25 border border-purple-400/30"
+    primary: "bg-gradient-to-b from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 active:from-blue-700 active:to-blue-800 text-white shadow-lg shadow-blue-500/25 border border-blue-400/30",
+    secondary: "bg-gradient-to-b from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 active:from-gray-800 active:to-gray-900 text-white shadow-lg shadow-gray-500/25 border border-gray-500/30",
+    action: "bg-gradient-to-b from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 active:from-purple-700 active:to-purple-800 text-white shadow-lg shadow-purple-500/25 border border-purple-400/30"
   };
 
-  const disabledClasses = "opacity-50 cursor-not-allowed";
+  const disabledClasses = "opacity-50 cursor-not-allowed pointer-events-none";
+
+  const handleClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!disabled && onClick) {
+      onClick();
+    }
+  };
+
+  const handleTouchStart = (e) => {
+    e.preventDefault();
+  };
 
   return (
     <button
-      onClick={onClick}
+      onClick={handleClick}
+      onTouchStart={handleTouchStart}
       disabled={disabled}
+      style={{ 
+        touchAction: 'manipulation',
+        WebkitTapHighlightColor: 'transparent'
+      }}
       className={`
         ${baseClasses}
         ${variants[variant]}
@@ -65,15 +82,25 @@ const ControlButton = ({ onClick, children, className = '', disabled = false, va
 };
 
 const Controls = ({ touchControls, isPlaying, isGameOver, startGame, resetGame }) => {
+  // Debug function for mobile testing
+  const handleStartGameDebug = () => {
+    console.log('Start Game clicked!', { isPlaying, isGameOver });
+    if (startGame && typeof startGame === 'function') {
+      startGame();
+    } else {
+      console.error('startGame is not a function:', startGame);
+    }
+  };
+
   return (
     <div className="controls-container space-y-4">
       {/* Controles de juego (Start/Pause/Reset) */}
       <div className="flex flex-wrap gap-3 justify-center">
         {!isPlaying && !isGameOver && (
           <ControlButton 
-            onClick={startGame} 
+            onClick={handleStartGameDebug} 
             variant="action" 
-            className="px-8 py-4 text-lg font-bold w-full md:w-auto min-h-[60px] shadow-xl"
+            className="px-8 py-4 text-lg font-bold w-full md:w-auto min-h-[60px] shadow-xl relative z-20 cursor-pointer"
           >
             <PlayIcon />
             <span className="ml-2">🎮 JUGAR</span>
@@ -84,7 +111,7 @@ const Controls = ({ touchControls, isPlaying, isGameOver, startGame, resetGame }
           <ControlButton 
             onClick={touchControls.pause} 
             variant="secondary" 
-            className="px-4 py-3 text-sm w-full md:w-auto"
+            className="px-4 py-3 text-sm w-full md:w-auto relative z-20 cursor-pointer"
           >
             <PauseIcon />
             <span className="ml-2">Pausa</span>
@@ -95,7 +122,7 @@ const Controls = ({ touchControls, isPlaying, isGameOver, startGame, resetGame }
           <ControlButton 
             onClick={resetGame} 
             variant="action" 
-            className="px-6 py-3 text-base w-full md:w-auto min-h-[50px]"
+            className="px-6 py-3 text-base w-full md:w-auto min-h-[50px] relative z-20 cursor-pointer"
           >
             <span>🔄 Reiniciar</span>
           </ControlButton>
@@ -109,7 +136,7 @@ const Controls = ({ touchControls, isPlaying, isGameOver, startGame, resetGame }
           <div className="flex justify-center mb-4">
             <ControlButton 
               onClick={touchControls.rotate} 
-              className="w-16 h-16"
+              className="w-16 h-16 cursor-pointer"
               variant="action"
             >
               <RotateIcon />
@@ -120,7 +147,7 @@ const Controls = ({ touchControls, isPlaying, isGameOver, startGame, resetGame }
           <div className="flex justify-center gap-4 mb-4">
             <ControlButton 
               onClick={touchControls.moveLeft} 
-              className="w-16 h-16"
+              className="w-16 h-16 cursor-pointer"
             >
               <ArrowLeftIcon />
             </ControlButton>
@@ -129,7 +156,7 @@ const Controls = ({ touchControls, isPlaying, isGameOver, startGame, resetGame }
             
             <ControlButton 
               onClick={touchControls.moveRight} 
-              className="w-16 h-16"
+              className="w-16 h-16 cursor-pointer"
             >
               <ArrowRightIcon />
             </ControlButton>
@@ -139,7 +166,7 @@ const Controls = ({ touchControls, isPlaying, isGameOver, startGame, resetGame }
           <div className="flex justify-center gap-2">
             <ControlButton 
               onClick={touchControls.moveDown} 
-              className="w-20 h-12 text-sm"
+              className="w-20 h-12 text-sm cursor-pointer"
             >
               <ArrowDownIcon />
               <span className="ml-1">Bajar</span>
@@ -147,7 +174,7 @@ const Controls = ({ touchControls, isPlaying, isGameOver, startGame, resetGame }
             
             <ControlButton 
               onClick={touchControls.hardDrop} 
-              className="w-20 h-12 text-sm"
+              className="w-20 h-12 text-sm cursor-pointer"
               variant="secondary"
             >
               <ArrowDownIcon />

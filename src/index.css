@@ -84,8 +84,10 @@ button, input, select, textarea {
 /* Mejoras para dispositivos táctiles */
 @media (max-width: 768px) {
   button {
-    min-height: 44px;
-    min-width: 44px;
+    min-height: 48px;
+    min-width: 48px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
   
   body {
@@ -101,12 +103,31 @@ button, input, select, textarea {
   /* Espaciado extra en móvil para asegurar que todo sea accesible */
   .controls-container {
     padding-bottom: 20px;
+    touch-action: manipulation;
   }
   
-  /* Asegurar que el botón Jugar sea bien visible */
+  /* Asegurar que todos los botones sean bien accesibles en móvil */
   .controls-container button {
     position: relative;
     z-index: 10;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    cursor: pointer;
+  }
+  
+  /* Mejoras específicas para el botón de jugar */
+  .controls-container button[class*="JUGAR"] {
+    z-index: 20;
+    pointer-events: all;
+  }
+  
+  /* Asegurar que el modal de game over esté por encima */
+  .fixed.inset-0 {
+    z-index: 50;
+  }
+  
+  .fixed.inset-0 button {
+    z-index: 60;
   }
 }
 

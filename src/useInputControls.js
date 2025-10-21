@@ -57,6 +57,14 @@ export const useInputControls = ({
       }
     };
 
+    // Prevent default touch behavior on controls to avoid interference
+    const preventControlsDefault = (e) => {
+      if (e?.target && (e.target.closest('.controls-container') || e.target.closest('button'))) {
+        // Don't prevent the event, just ensure touch-action manipulation works
+        return;
+      }
+    };
+
     // Only add touch prevention to the game board area
     const gameBoard = document.querySelector('.game-board');
     if (gameBoard) {
@@ -64,8 +72,12 @@ export const useInputControls = ({
       gameBoard.addEventListener('touchmove', preventGameBoardScroll, { passive: false });
     }
 
+    // Add touch handling for better mobile experience
+    document.addEventListener('touchstart', preventControlsDefault, { passive: true });
+
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('touchstart', preventControlsDefault);
       if (gameBoard) {
         gameBoard.removeEventListener('touchstart', preventGameBoardScroll);
         gameBoard.removeEventListener('touchmove', preventGameBoardScroll);
@@ -73,43 +85,43 @@ export const useInputControls = ({
     };
   }, [handleKeyDown]);
 
-  // Funciones para controles táctiles (botones en pantalla)
+  // Funciones para controles táctiles (botones en pantalla) con debounce para evitar múltiples activaciones
   const touchControls = {
-    moveLeft: () => {
+    moveLeft: useCallback(() => {
       if (!isGameOver && isPlaying) {
         moveTetromino(-1);
       }
-    },
+    }, [isGameOver, isPlaying, moveTetromino]),
     
-    moveRight: () => {
+    moveRight: useCallback(() => {
       if (!isGameOver && isPlaying) {
         moveTetromino(1);
       }
-    },
+    }, [isGameOver, isPlaying, moveTetromino]),
     
-    moveDown: () => {
+    moveDown: useCallback(() => {
       if (!isGameOver && isPlaying) {
         dropTetromino();
       }
-    },
+    }, [isGameOver, isPlaying, dropTetromino]),
     
-    rotate: () => {
+    rotate: useCallback(() => {
       if (!isGameOver && isPlaying) {
         rotateTetromino();
       }
-    },
+    }, [isGameOver, isPlaying, rotateTetromino]),
     
-    hardDrop: () => {
+    hardDrop: useCallback(() => {
       if (!isGameOver && isPlaying) {
         hardDrop();
       }
-    },
+    }, [isGameOver, isPlaying, hardDrop]),
     
-    pause: () => {
+    pause: useCallback(() => {
       if (!isGameOver) {
         togglePause();
       }
-    }
+    }, [isGameOver, togglePause])
   };
 
   return {

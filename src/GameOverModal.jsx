@@ -68,16 +68,34 @@ const GameOverModal = ({ isVisible, score, level, lines, onRestart, onClose }) =
         {/* Botones de acción */}
         <div className="p-4 space-y-3">
           <button
-            onClick={onRestart}
-            className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-lg shadow-green-500/25"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onRestart();
+            }}
+            onTouchStart={(e) => e.preventDefault()}
+            style={{ 
+              touchAction: 'manipulation',
+              WebkitTapHighlightColor: 'transparent'
+            }}
+            className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 active:from-green-700 active:to-green-800 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-lg shadow-green-500/25 cursor-pointer relative z-30"
           >
             🎮 Jugar de Nuevo
           </button>
           
           {onClose && (
             <button
-              onClick={onClose}
-              className="w-full bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200 shadow-lg shadow-gray-500/25"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onClose();
+              }}
+              onTouchStart={(e) => e.preventDefault()}
+              style={{ 
+                touchAction: 'manipulation',
+                WebkitTapHighlightColor: 'transparent'
+              }}
+              className="w-full bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 active:from-gray-800 active:to-gray-900 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200 shadow-lg shadow-gray-500/25 cursor-pointer relative z-30"
             >
               Cerrar
             </button>
